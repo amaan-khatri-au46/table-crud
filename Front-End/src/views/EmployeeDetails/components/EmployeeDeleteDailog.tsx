@@ -14,33 +14,39 @@ const EmployeeDeleteDialog = () => {
   const { openDeleteDailog, loading, deleteRow, pagination }: any =
     useAppSelector((state) => state.employeeDetail);
 
-  const handleClose = () => {
-    dispatch(setOpenDeleteDailog(false));
-  };
-
   const handleDelete = async () => {
-    await dispatch(deleteEmployee(deleteRow?._id));
-    await dispatch(
-      fetchEmployee({
-        pageIndex: pagination?.pageIndex,
-        pageSize: pagination?.pageSize,
-      })
-    );
-    handleClose();
-    showToast("Employee Deleted Successfully", "success");
+    try {
+      const res = await dispatch(deleteEmployee(deleteRow?._id));
+      await dispatch(
+        fetchEmployee({
+          pageIndex: pagination?.pageIndex,
+          pageSize: pagination?.pageSize,
+        })
+      );
+      await dispatch(setOpenDeleteDailog(false));
+      if (res.payload.status === 201) {
+        showToast(res?.payload?.data?.message, "success");
+      } else {
+        showToast("Failed to delete employee", "error");
+      }
+    } catch (error) {
+      showToast("Something went wrong please try later", "error");
+    }
   };
 
   return (
     <ConfirmDailoag
       open={openDeleteDailog}
-      onCancel={handleClose}
+      onCancel={() => {
+        dispatch(setOpenDeleteDailog(false));
+      }}
       onDelete={handleDelete}
       loading={loading}
       title="Delete Employee"
     >
       <p>
         Are you sure you want to delete this employee{" "}
-        <b>{deleteRow?.firstName}?</b>
+        <b>{`${deleteRow?.firstName} ${deleteRow?.lastName}`}?</b>
       </p>
     </ConfirmDailoag>
   );

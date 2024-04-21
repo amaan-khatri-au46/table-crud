@@ -50,8 +50,8 @@ export const deleteEmployee = createAsyncThunk(
     try {
       const response = await apiDeleteEmployee(employeeId);
       return response;
-    } catch (error) {
-      throw error;
+    } catch (error:any) {
+      return error?.response;
     }
   }
 );

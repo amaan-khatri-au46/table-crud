@@ -46,12 +46,14 @@ const updateEmployee = async (req, res) => {
   try {
     const updatedEmployee = await Employee.findByIdAndUpdate(id, req.body, {
       new: true,
-      runValidators: true, 
+      runValidators: true,
     });
     if (!updatedEmployee) {
       return res.status(404).json({ message: "Employee not found" });
     }
-    res.json(updatedEmployee);
+    res
+      .status(201)
+      .json({ message: "Employee edited successfully", updatedEmployee });
   } catch (error) {
     if (error.code === 11000 && error.keyPattern && error.keyPattern.email) {
       res.status(400).json({
@@ -71,7 +73,7 @@ const deleteEmployee = async (req, res) => {
     if (!deletedEmployee) {
       return res.status(404).json({ message: "Employee not found" });
     }
-    res.json({ message: "Employee deleted successfully" });
+    res.status(201).json({ message: "Employee deleted successfully" });
   } catch (error) {
     console.error("Error deleting employee:", error);
     res.status(500).json({ error: "Failed to delete employee" });
